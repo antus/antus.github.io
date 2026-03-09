@@ -1,0 +1,2040 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>URBOS — Urban Operating System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  /* Dark theme (default) — lighter, higher contrast */
+  --bg: #0f1923;
+  --bg-2: #141f2e;
+  --bg-3: #18263a;
+  --surface: #1a2d42;
+  --surface-2: #1f3450;
+  --border: rgba(0,210,200,0.18);
+  --border-bright: rgba(0,210,200,0.45);
+  --text: #f0f8ff;
+  --text-2: #a8cce0;
+  --text-3: #5d8aa8;
+  --accent: #00e5d8;
+  --accent-2: #1a8fff;
+  --accent-3: #9b6bff;
+  --glow: rgba(0,229,216,0.2);
+  --glow-2: rgba(26,143,255,0.15);
+  --grid-color: rgba(0,229,216,0.06);
+  --hero-grad: linear-gradient(135deg, #0f1923 0%, #111e30 50%, #0d1720 100%);
+  --card-bg: rgba(26,45,66,0.85);
+  --card-bg-hover: rgba(31,52,80,0.98);
+  --nav-bg: rgba(15,25,35,0.92);
+  --tag-bg: rgba(0,229,216,0.1);
+  --tag-text: #00e5d8;
+  --shadow: 0 0 60px rgba(0,229,216,0.1);
+  --stat-bg: rgba(0,229,216,0.07);
+}
+
+[data-theme="light"] {
+  --bg: #f0f6fa;
+  --bg-2: #e8f2f8;
+  --bg-3: #ddeaf2;
+  --surface: #ffffff;
+  --surface-2: #f5fafd;
+  --border: rgba(0,100,160,0.12);
+  --border-bright: rgba(0,100,160,0.3);
+  --text: #0d2035;
+  --text-2: #3a6480;
+  --text-3: #7aa0bb;
+  --accent: #007a8a;
+  --accent-2: #0055cc;
+  --accent-3: #5b2fd4;
+  --glow: rgba(0,122,138,0.08);
+  --glow-2: rgba(0,85,204,0.06);
+  --grid-color: rgba(0,100,160,0.05);
+  --hero-grad: linear-gradient(135deg, #e8f4fa 0%, #f0f8fc 50%, #eaf2f8 100%);
+  --card-bg: rgba(255,255,255,0.9);
+  --card-bg-hover: rgba(245,252,255,1);
+  --nav-bg: rgba(240,246,250,0.92);
+  --tag-bg: rgba(0,122,138,0.08);
+  --tag-text: #006272;
+  --shadow: 0 0 60px rgba(0,100,160,0.06);
+  --stat-bg: rgba(0,122,138,0.05);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  transition: background 0.4s ease, color 0.4s ease;
+  line-height: 1.6;
+}
+
+/* ── Grid Background ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0;
+  background-image:
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+
+/* ── Typography ── */
+h1, h2, h3, h4 { font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; line-height: 1.1; letter-spacing: -0.02em; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: var(--nav-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 clamp(1.5rem, 5vw, 4rem);
+  height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  transition: all 0.4s ease;
+}
+
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none;
+}
+.nav-logo-mark {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+  font-weight: 800; font-size: 14px; color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.nav-logo-mark::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%);
+}
+.nav-logo-text {
+  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+  font-weight: 700; font-size: 18px;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+.nav-logo-text span { color: var(--accent); }
+
+.nav-links {
+  display: flex; align-items: center; gap: 2rem;
+  list-style: none;
+}
+.nav-links a {
+  text-decoration: none;
+  color: var(--text-2);
+  font-size: 14px; font-weight: 500;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+}
+.nav-links a:hover { color: var(--accent); }
+
+.nav-actions {
+  display: flex; align-items: center; gap: 12px;
+}
+
+.btn-lang {
+  background: var(--tag-bg);
+  border: 1px solid var(--border);
+  color: var(--accent);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px; font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.05em;
+}
+.btn-lang:hover { background: var(--border-bright); border-color: var(--accent); }
+
+.btn-theme {
+  width: 36px; height: 36px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s ease;
+  color: var(--text-2);
+  font-size: 16px;
+}
+.btn-theme:hover { border-color: var(--accent); color: var(--accent); }
+
+.btn-cta-nav {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border: none;
+  color: #fff;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'DM Sans', sans-serif;
+  white-space: nowrap;
+}
+.btn-cta-nav:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 20px var(--glow); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  background: var(--hero-grad);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: clamp(2rem, 4vw, 5rem);
+  padding: 100px clamp(1.5rem, 5vw, 6rem) 80px;
+  position: relative; overflow: hidden; z-index: 1;
+}
+
+@media (max-width: 1100px) {
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 100px clamp(1.5rem, 5vw, 4rem) 60px;
+  }
+}
+
+.hero-orb-1 {
+  position: absolute; width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(0,210,200,0.07) 0%, transparent 70%);
+  top: -200px; right: -100px; pointer-events: none;
+}
+.hero-orb-2 {
+  position: absolute; width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(0,112,255,0.06) 0%, transparent 70%);
+  bottom: -100px; left: 10%; pointer-events: none;
+}
+[data-theme="light"] .hero-orb-1 {
+  background: radial-gradient(circle, rgba(0,122,138,0.08) 0%, transparent 70%);
+}
+[data-theme="light"] .hero-orb-2 {
+  background: radial-gradient(circle, rgba(0,85,204,0.05) 0%, transparent 70%);
+}
+
+.hero-content {
+  max-width: 620px;
+  position: relative; z-index: 2;
+  /* stays in its grid cell, never overlaps */
+}
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--tag-bg);
+  border: 1px solid var(--border-bright);
+  padding: 6px 14px 6px 10px;
+  border-radius: 100px;
+  margin-bottom: 2rem;
+  animation: fadeInUp 0.6s ease both;
+}
+.hero-badge-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 2s ease infinite;
+}
+.hero-badge span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 500;
+  color: var(--accent); letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.4); }
+}
+
+h1.hero-title {
+  font-size: clamp(2.2rem, 5vw, 4.5rem);
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 1.5rem;
+  animation: fadeInUp 0.7s ease 0.1s both;
+}
+h1.hero-title .accent { color: var(--accent); }
+h1.hero-title .accent-2 { color: var(--accent-2); }
+
+.hero-desc {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: var(--text-2);
+  max-width: 560px;
+  line-height: 1.7;
+  margin-bottom: 2.5rem;
+  animation: fadeInUp 0.7s ease 0.2s both;
+  font-weight: 300;
+}
+
+.hero-actions {
+  display: flex; gap: 1rem; flex-wrap: wrap;
+  animation: fadeInUp 0.7s ease 0.3s both;
+}
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-size: 15px; font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: none; cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  box-shadow: 0 4px 24px var(--glow);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px var(--glow); opacity: 0.95; }
+
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: transparent;
+  color: var(--text);
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-size: 15px; font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border-bright);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-secondary:hover { background: var(--surface); border-color: var(--accent); color: var(--accent); }
+
+.hero-stats {
+  display: flex; gap: 2.5rem; flex-wrap: wrap;
+  margin-top: 4rem; padding-top: 2rem;
+  border-top: 1px solid var(--border);
+  animation: fadeInUp 0.7s ease 0.4s both;
+}
+.stat { }
+.stat-num {
+  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+  font-size: 2rem; font-weight: 800;
+  color: var(--accent);
+  letter-spacing: -0.03em;
+}
+.stat-label {
+  font-size: 12px; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+
+/* ── Hero Visual ── */
+.hero-visual {
+  position: relative; z-index: 2;
+  width: 100%;
+  animation: fadeInRight 1s ease 0.5s both;
+}
+
+@media (max-width: 1100px) {
+  .hero-visual {
+    max-width: 600px;
+    margin: 0 auto;
+    animation: fadeInUp 1s ease 0.5s both;
+  }
+}
+
+.city-panel {
+  background: var(--card-bg);
+  backdrop-filter: blur(24px);
+  border: 1px solid var(--border-bright);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow), 0 20px 60px rgba(0,0,0,0.3);
+}
+[data-theme="light"] .city-panel {
+  box-shadow: var(--shadow), 0 20px 60px rgba(0,0,0,0.08);
+}
+.city-panel-header {
+  background: var(--surface);
+  padding: 14px 20px;
+  display: flex; align-items: center; gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; }
+.dot.r { background: #ff5f57; }
+.dot.y { background: #ffbd2e; }
+.dot.g { background: #28c840; }
+.city-panel-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--text-3);
+  margin-left: 4px; letter-spacing: 0.05em;
+}
+
+/* City Map image area */
+.city-map {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: var(--bg);
+  position: relative; overflow: hidden;
+}
+
+/* Metric rows */
+.city-metrics {
+  padding: 16px 20px;
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+.metric {
+  background: var(--stat-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  transition: border-color 0.3s;
+}
+.metric:hover { border-color: var(--accent); }
+.metric-val {
+  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+  font-size: 18px; font-weight: 700;
+  color: var(--accent);
+}
+.metric-key {
+  font-size: 10px; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+
+/* Alert strip */
+.city-alert {
+  margin: 0 20px 16px;
+  padding: 10px 14px;
+  background: rgba(0,210,200,0.06);
+  border: 1px solid rgba(0,210,200,0.2);
+  border-radius: 8px;
+  display: flex; align-items: center; gap: 10px;
+}
+[data-theme="light"] .city-alert {
+  background: rgba(0,122,138,0.06);
+  border-color: rgba(0,122,138,0.2);
+}
+.city-alert-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 2s ease infinite;
+  flex-shrink: 0;
+}
+.city-alert-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--text-2);
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ── SECTIONS ── */
+section { padding: clamp(5rem, 10vw, 8rem) clamp(1.5rem, 8vw, 8rem); position: relative; z-index: 1; }
+
+.section-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 500;
+  color: var(--accent);
+  text-transform: uppercase; letter-spacing: 0.12em;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-tag::before {
+  content: '';
+  display: block; width: 20px; height: 1px;
+  background: var(--accent);
+}
+
+h2.section-title {
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 1rem;
+  letter-spacing: -0.03em;
+}
+.section-desc {
+  font-size: 1.05rem;
+  color: var(--text-2);
+  max-width: 560px;
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+/* ── CAPABILITIES ── */
+.capabilities { background: var(--bg-2); }
+
+.caps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5px;
+  margin-top: 4rem;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.cap-card {
+  background: var(--card-bg);
+  padding: 2.5rem;
+  transition: background 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.cap-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.cap-card:hover { background: var(--card-bg-hover); }
+.cap-card:hover::before { opacity: 1; }
+
+.cap-icon {
+  width: 48px; height: 48px;
+  background: var(--tag-bg);
+  border: 1px solid var(--border-bright);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s;
+}
+.cap-card:hover .cap-icon { border-color: var(--accent); background: rgba(0,210,200,0.1); }
+
+.cap-title {
+  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+  font-size: 1.1rem; font-weight: 700;
+  color: var(--text); margin-bottom: 0.75rem;
+}
+.cap-desc { font-size: 0.9rem; color: var(--text-2); line-height: 1.65; }
+
+.cap-tags {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 1rem;
+}
+.cap-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.04em;
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  padding: 3px 8px; border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+/* ── PLATFORM ARCHITECTURE ── */
+.architecture { background: var(--bg); }
+
+.arch-diagram {
+  margin-top: 4rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.arch-row {
+  display: grid; gap: 1px; background: var(--border);
+}
+.arch-row.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.arch-row.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.arch-row.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.arch-row.cols-1 { grid-template-columns: 1fr; }
+
+.arch-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: 0.1em;
+  padding: 10px 20px 4px;
+  background: var(--surface);
+}
+
+.arch-cell {
+  background: var(--card-bg);
+  padding: 1.5rem 2rem;
+  transition: background 0.3s;
+}
+.arch-cell:hover { background: var(--card-bg-hover); }
+.arch-cell-title {
+  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-weight: 700;
+  font-size: 0.9rem; color: var(--text);
+  margin-bottom: 0.5rem;
+}
+.arch-cell-items {
+  display: flex; flex-direction: column; gap: 4px;
+}
+.arch-cell-item {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--text-3);
+  display: flex; align-items: center; gap: 6px;
+}
+.arch-cell-item::before {
+  content: '▸'; color: var(--accent); font-size: 8px; flex-shrink: 0;
+}
+
+.arch-cell.highlight { background: rgba(0,210,200,0.04); }
+.arch-cell.highlight .arch-cell-title { color: var(--accent); }
+
+/* ── ANALYTICS ── */
+.analytics { background: var(--bg-2); }
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 2rem; margin-top: 4rem;
+  align-items: start;
+}
+
+.analytics-features { display: flex; flex-direction: column; gap: 1rem; }
+
+.feature-item {
+  display: flex; gap: 1.25rem; align-items: flex-start;
+  padding: 1.5rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  transition: all 0.3s ease;
+  cursor: default;
+}
+.feature-item:hover { border-color: var(--accent); background: var(--card-bg-hover); transform: translateX(4px); }
+.feature-item-icon {
+  width: 40px; height: 40px; flex-shrink: 0;
+  background: var(--tag-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  transition: all 0.3s;
+}
+.feature-item:hover .feature-item-icon { border-color: var(--accent); }
+.feature-item-content { }
+.feature-item-title { font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-weight: 700; font-size: 0.95rem; color: var(--text); margin-bottom: 4px; }
+.feature-item-desc { font-size: 0.85rem; color: var(--text-2); line-height: 1.55; }
+
+/* Dashboard mockup */
+.dashboard-mock {
+  background: var(--card-bg);
+  border: 1px solid var(--border-bright);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  position: sticky; top: 100px;
+}
+.dash-header {
+  background: var(--surface);
+  padding: 14px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+.dash-header-left { display: flex; align-items: center; gap: 8px; }
+.dash-header-title { font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 13px; font-weight: 700; color: var(--text); }
+.dash-status { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--accent); }
+.dash-body { padding: 20px; }
+
+.dash-kpi-row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin-bottom: 16px;
+}
+.kpi {
+  background: var(--stat-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px;
+}
+.kpi-val { font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--accent); }
+.kpi-label { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+.kpi-delta {
+  font-size: 10px; color: #28c840;
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 2px;
+}
+
+/* Mini chart */
+.mini-chart {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.mini-chart-title { font-size: 11px; color: var(--text-3); margin-bottom: 10px; font-family: 'JetBrains Mono', monospace; }
+.bar-chart { display: flex; align-items: flex-end; gap: 4px; height: 60px; }
+.bar {
+  flex: 1;
+  background: linear-gradient(to top, var(--accent), var(--accent-2));
+  border-radius: 3px 3px 0 0;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  min-height: 4px;
+}
+.bar:hover { opacity: 1; }
+
+/* Alerts list */
+.alerts-list { display: flex; flex-direction: column; gap: 8px; }
+.alert-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px;
+  background: var(--surface);
+  border-radius: 8px; border: 1px solid var(--border);
+  font-size: 11px; color: var(--text-2);
+  font-family: 'JetBrains Mono', monospace;
+}
+.alert-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.alert-dot.warn { background: #ffbd2e; animation: pulse 2s ease infinite; }
+.alert-dot.ok { background: #28c840; }
+.alert-dot.info { background: var(--accent-2); }
+
+/* ── PRICING ── */
+.pricing { background: var(--bg); }
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem; margin-top: 4rem;
+  align-items: start;
+}
+
+.plan {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+}
+.plan:hover { border-color: var(--border-bright); transform: translateY(-4px); box-shadow: 0 20px 60px var(--glow); }
+.plan.featured {
+  background: var(--surface);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), 0 20px 60px var(--glow);
+}
+
+.plan-badge {
+  position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff; padding: 4px 14px;
+  border-radius: 100px; font-size: 11px; font-weight: 600;
+  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.plan-name { font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 1rem; font-weight: 700; color: var(--text-2); margin-bottom: 0.5rem; }
+.plan-price {
+  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+  font-size: 2.5rem; font-weight: 800;
+  color: var(--text); letter-spacing: -0.04em;
+  margin-bottom: 0.25rem;
+}
+.plan-price span { font-size: 1rem; font-weight: 400; color: var(--text-3); }
+.plan-desc { font-size: 0.85rem; color: var(--text-2); margin-bottom: 1.5rem; line-height: 1.5; }
+
+.plan-divider { height: 1px; background: var(--border); margin-bottom: 1.5rem; }
+
+.plan-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 2rem; }
+.plan-features li {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 0.875rem; color: var(--text-2);
+}
+.plan-features li::before { content: '✓'; color: var(--accent); flex-shrink: 0; font-weight: 700; }
+.plan-features li.disabled { opacity: 0.4; }
+.plan-features li.disabled::before { content: '—'; color: var(--text-3); }
+
+.btn-plan {
+  display: block; width: 100%;
+  padding: 12px;
+  text-align: center;
+  border-radius: 10px;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s ease;
+  font-family: 'DM Sans', sans-serif;
+  border: none;
+}
+.btn-plan.outline {
+  background: transparent;
+  border: 1px solid var(--border-bright);
+  color: var(--text);
+}
+.btn-plan.outline:hover { border-color: var(--accent); color: var(--accent); background: var(--tag-bg); }
+.btn-plan.solid {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+}
+.btn-plan.solid:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 6px 24px var(--glow); }
+
+/* ── USE CASES ── */
+.usecases { background: var(--bg-2); }
+
+.usecases-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem; margin-top: 4rem;
+}
+
+.usecase-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 2rem;
+  transition: all 0.3s ease; position: relative;
+  overflow: hidden;
+}
+.usecase-card::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.4s ease;
+}
+.usecase-card:hover { border-color: var(--border-bright); transform: translateY(-4px); box-shadow: 0 16px 48px var(--glow); }
+.usecase-card:hover::after { transform: scaleX(1); }
+
+.usecase-icon { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+.usecase-title { font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-weight: 700; font-size: 1rem; color: var(--text); margin-bottom: 0.5rem; }
+.usecase-desc { font-size: 0.875rem; color: var(--text-2); line-height: 1.6; }
+
+/* ── INTEGRATIONS ── */
+.integrations { background: var(--bg); }
+
+.int-row {
+  display: flex; flex-wrap: wrap; gap: 12px; margin-top: 2.5rem;
+  justify-content: flex-start;
+}
+.int-badge {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  padding: 10px 16px; border-radius: 100px;
+  font-size: 13px; font-weight: 500; color: var(--text-2);
+  transition: all 0.2s ease;
+}
+.int-badge:hover { border-color: var(--accent); color: var(--text); }
+.int-icon { font-size: 16px; }
+
+/* ── CTA ── */
+.cta-section {
+  background: var(--bg-2);
+  text-align: center;
+  padding: clamp(5rem, 10vw, 10rem) clamp(1.5rem, 8vw, 8rem);
+  position: relative; overflow: hidden; z-index: 1;
+}
+.cta-section::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(0,210,200,0.05) 0%, transparent 70%);
+}
+[data-theme="light"] .cta-section::before {
+  background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(0,122,138,0.06) 0%, transparent 70%);
+}
+.cta-title { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; color: var(--text); margin-bottom: 1.5rem; max-width: 700px; margin-inline: auto; }
+.cta-desc { font-size: 1.1rem; color: var(--text-2); margin-bottom: 2.5rem; max-width: 480px; margin-inline: auto; }
+.cta-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: 4rem clamp(1.5rem, 8vw, 8rem) 2rem;
+  z-index: 1; position: relative;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr repeat(3, 1fr);
+  gap: 3rem; margin-bottom: 3rem;
+}
+.footer-brand-desc { font-size: 0.875rem; color: var(--text-3); line-height: 1.7; margin-top: 1rem; }
+.footer-col-title { font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-weight: 700; font-size: 0.875rem; color: var(--text); margin-bottom: 1rem; }
+.footer-links { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.footer-links a { text-decoration: none; font-size: 0.875rem; color: var(--text-3); transition: color 0.2s; }
+.footer-links a:hover { color: var(--accent); }
+.footer-bottom {
+  padding-top: 2rem; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+}
+.footer-copy { font-size: 12px; color: var(--text-3); font-family: 'JetBrains Mono', monospace; }
+.footer-legal { display: flex; gap: 1.5rem; }
+.footer-legal a { font-size: 12px; color: var(--text-3); text-decoration: none; transition: color 0.2s; }
+.footer-legal a:hover { color: var(--accent); }
+
+/* ── SCREENSHOTS / CAROUSEL ── */
+.screenshots { background: var(--bg-2); }
+
+.carousel-outer { width: 100%; }
+
+.carousel-frame {
+  position: relative;
+  background: var(--card-bg);
+  border: 1px solid var(--border-bright);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow), 0 24px 64px rgba(0,0,0,0.35);
+  aspect-ratio: 16/7;
+  user-select: none;
+}
+[data-theme="light"] .carousel-frame {
+  box-shadow: var(--shadow), 0 24px 64px rgba(0,0,0,0.1);
+}
+
+.carousel-track {
+  display: flex;
+  width: 100%; height: 100%;
+  transition: transform 0.55s cubic-bezier(0.77,0,0.175,1);
+  will-change: transform;
+}
+
+.carousel-slide {
+  min-width: 100%; height: 100%;
+  position: relative; overflow: hidden; flex-shrink: 0;
+}
+.carousel-slide img {
+  width: 100%; height: 100%; object-fit: cover;
+  display: block;
+  transition: transform 6s ease;
+}
+.carousel-slide.active img { transform: scale(1.04); }
+
+/* Caption overlay */
+.carousel-caption {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 2rem 2.5rem;
+  background: linear-gradient(to top, rgba(8,18,30,0.92) 0%, rgba(8,18,30,0.5) 60%, transparent 100%);
+  display: flex; flex-direction: column; gap: 6px;
+}
+[data-theme="light"] .carousel-caption {
+  background: linear-gradient(to top, rgba(0,20,45,0.88) 0%, rgba(0,20,45,0.45) 60%, transparent 100%);
+}
+.screenshot-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.08em;
+  background: var(--accent);
+  color: #000; font-weight: 700;
+  padding: 3px 10px; border-radius: 100px;
+  text-transform: uppercase; width: fit-content;
+}
+.carousel-caption-title {
+  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+  font-weight: 800; font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+  color: #fff; letter-spacing: -0.02em;
+}
+.carousel-caption-desc {
+  font-size: clamp(0.8rem, 1.2vw, 0.95rem);
+  color: rgba(255,255,255,0.75);
+  max-width: 560px; line-height: 1.5;
+}
+
+/* Prev / Next */
+.carousel-btn {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 48px; height: 48px;
+  background: rgba(15,25,40,0.75);
+  border: 1px solid rgba(0,229,216,0.35);
+  color: #fff; border-radius: 50%;
+  font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+  z-index: 10;
+}
+.carousel-btn:hover { background: rgba(0,229,216,0.25); border-color: var(--accent); color: var(--accent); }
+.carousel-btn-prev { left: 1.25rem; }
+.carousel-btn-next { right: 1.25rem; }
+
+/* Counter */
+.carousel-counter {
+  position: absolute; top: 1rem; right: 1.25rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: rgba(255,255,255,0.6);
+  background: rgba(0,0,0,0.45);
+  padding: 4px 10px; border-radius: 100px;
+  backdrop-filter: blur(6px);
+}
+
+/* Dots */
+.carousel-dots {
+  display: flex; justify-content: center; gap: 8px;
+  margin-top: 1.25rem;
+}
+.carousel-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--border-bright);
+  cursor: pointer; transition: all 0.3s ease;
+  border: none; padding: 0;
+}
+.carousel-dot.active {
+  background: var(--accent);
+  width: 24px; border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+  .carousel-frame { aspect-ratio: 4/3; }
+  .carousel-caption { padding: 1.25rem; }
+  .carousel-btn { width: 36px; height: 36px; font-size: 14px; }
+}
+
+/* ── 4-col pricing ── */
+.pricing-grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+@media (max-width: 1200px) {
+  .pricing-grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .pricing-grid-4 { grid-template-columns: 1fr; }
+}
+
+
+@media (max-width: 1100px) {
+  .analytics-grid { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .arch-row.cols-4, .arch-row.cols-3 { grid-template-columns: 1fr 1fr; }
+  .hero-actions { flex-direction: column; align-items: flex-start; }
+  .footer-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .arch-row.cols-4, .arch-row.cols-3, .arch-row.cols-2 { grid-template-columns: 1fr; }
+  .hero-stats { gap: 1.5rem; }
+}
+
+/* ── SCROLL ANIMATIONS ── */
+.reveal {
+  opacity: 0; transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible {
+  opacity: 1; transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-mark">U</div>
+    <span class="nav-logo-text">URB<span>OS</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#capabilities" data-i18n="nav_capabilities">Capabilities</a></li>
+    <li><a href="#architecture" data-i18n="nav_architecture">Architecture</a></li>
+    <li><a href="#analytics" data-i18n="nav_analytics">Analytics</a></li>
+    <li><a href="#usecases" data-i18n="nav_usecases">Use Cases</a></li>
+    <li><a href="#pricing" data-i18n="nav_pricing">Pricing</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="btn-lang" onclick="toggleLang()" id="langBtn">IT</button>
+    <button class="btn-theme" onclick="toggleTheme()" id="themeBtn" title="Toggle theme">☀</button>
+    <button class="btn-cta-nav" data-i18n="nav_demo">Request Demo</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-orb-1"></div>
+  <div class="hero-orb-2"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      <span data-i18n="hero_badge">City Urban Operating System — SaaS Platform</span>
+    </div>
+    <h1 class="hero-title" data-i18n-html="hero_title">The <span class="accent">Digital Twin</span><br>for the <span class="accent-2">Modern City</span></h1>
+    <p class="hero-desc" data-i18n="hero_desc">Real-time monitoring, simulation, and AI-powered analytics for municipalities, utilities, and infrastructure operators — delivered as a scalable multi-tenant platform.</p>
+    <div class="hero-actions">
+      <a href="#pricing" class="btn-primary">
+        <span data-i18n="hero_cta1">Start Free Trial</span>
+        <span>→</span>
+      </a>
+      <a href="#capabilities" class="btn-secondary">
+        <span data-i18n="hero_cta2">Explore Platform</span>
+      </a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">4D</div>
+        <div class="stat-label mono" data-i18n="stat_maps">Interactive Maps</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">RT</div>
+        <div class="stat-label mono" data-i18n="stat_stream">Real-Time Streams</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">AI</div>
+        <div class="stat-label mono" data-i18n="stat_models">Predictive Models</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">OGC</div>
+        <div class="stat-label mono" data-i18n="stat_standards">Standards Compliant</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero Visual Panel -->
+  <div class="hero-visual">
+    <div class="city-panel">
+      <div class="city-panel-header">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <span class="city-panel-title mono">urbos://milan.digital-twin — live</span>
+      </div>
+      <div class="city-map">
+        <img src="https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=900&q=85&auto=format&fit=crop" alt="Milan Digital Twin Live View" style="width:100%;height:100%;object-fit:cover;display:block;opacity:0.82;"/>
+      </div>
+      <div class="city-metrics">
+        <div class="metric">
+          <div class="metric-val">97.3%</div>
+          <div class="metric-key mono" data-i18n="metric_uptime">Uptime</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val">2.4k</div>
+          <div class="metric-key mono" data-i18n="metric_sensors">Sensors</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val">12ms</div>
+          <div class="metric-key mono" data-i18n="metric_latency">Latency</div>
+        </div>
+      </div>
+      <div class="city-alert">
+        <div class="city-alert-dot"></div>
+        <span class="city-alert-text" data-i18n="hero_panel_alert">LIVE · Traffic anomaly detected — Zone B3 · Alert #4821</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CAPABILITIES -->
+<section class="capabilities" id="capabilities">
+  <div class="section-tag" data-i18n="caps_tag">Core Capabilities</div>
+  <h2 class="section-title reveal" data-i18n="caps_title">Everything you need to manage a city</h2>
+  <p class="section-desc reveal reveal-delay-1" data-i18n="caps_desc">A unified platform for data ingestion, analysis, simulation, and decision support — designed for the complexity of modern urban environments.</p>
+
+  <div class="caps-grid">
+    <div class="cap-card reveal">
+      <div class="cap-icon">🛰️</div>
+      <div class="cap-title" data-i18n="cap1_title">Earth Observation Data</div>
+      <div class="cap-desc" data-i18n="cap1_desc">Ingest satellite EO data from Copernicus Sentinel-1/2/3 and IRIDE. SAR and optical imagery processing, fully integrated into the data pipeline.</div>
+      <div class="cap-tags">
+        <span class="cap-tag">Sentinel-1</span><span class="cap-tag">Sentinel-2</span>
+        <span class="cap-tag">IRIDE</span><span class="cap-tag">SAR</span><span class="cap-tag">Optical</span>
+      </div>
+    </div>
+    <div class="cap-card reveal reveal-delay-1">
+      <div class="cap-icon">📡</div>
+      <div class="cap-title" data-i18n="cap2_title">Real-Time IoT & SCADA</div>
+      <div class="cap-desc" data-i18n="cap2_desc">Connect in-situ sensors, IoT devices, SCADA systems, weather services, and real-time telemetry feeds for continuous urban monitoring.</div>
+      <div class="cap-tags">
+        <span class="cap-tag">IoT</span><span class="cap-tag">SCADA</span>
+        <span class="cap-tag">Weather API</span><span class="cap-tag">Telemetry</span>
+      </div>
+    </div>
+    <div class="cap-card reveal reveal-delay-2">
+      <div class="cap-icon">🗺️</div>
+      <div class="cap-title" data-i18n="cap3_title">OGC Geospatial Services</div>
+      <div class="cap-desc" data-i18n="cap3_desc">Full compliance with OGC standards. Connect WMS, WFS, WCS, WMTS, and STAC catalogs seamlessly with the platform's ingestion layer.</div>
+      <div class="cap-tags">
+        <span class="cap-tag">WMS</span><span class="cap-tag">WFS</span>
+        <span class="cap-tag">WCS</span><span class="cap-tag">WMTS</span><span class="cap-tag">STAC</span>
+      </div>
+    </div>
+    <div class="cap-card reveal">
+      <div class="cap-icon">🧩</div>
+      <div class="cap-title" data-i18n="cap4_title">4D Interactive Maps</div>
+      <div class="cap-desc" data-i18n="cap4_desc">Web-based 3D/4D geospatial visualization with time-enabled urban data layers, digital twin integration, and a no-code map builder with pluggable widgets.</div>
+      <div class="cap-tags">
+        <span class="cap-tag">3D/4D</span><span class="cap-tag">Map Builder</span>
+        <span class="cap-tag">Widgets</span><span class="cap-tag">Time Series</span>
+      </div>
+    </div>
+    <div class="cap-card reveal reveal-delay-1">
+      <div class="cap-icon">🤖</div>
+      <div class="cap-title" data-i18n="cap5_title">GeoAI & Predictive Models</div>
+      <div class="cap-desc" data-i18n="cap5_desc">ML models for urban pattern analysis, anomaly detection, and predictive analytics for infrastructure and environmental monitoring via a visual workflow builder.</div>
+      <div class="cap-tags">
+        <span class="cap-tag">ML Models</span><span class="cap-tag">Anomaly Detection</span>
+        <span class="cap-tag">Workflow Builder</span>
+      </div>
+    </div>
+    <div class="cap-card reveal reveal-delay-2">
+      <div class="cap-icon">⚡</div>
+      <div class="cap-title" data-i18n="cap6_title">Operational Dashboards</div>
+      <div class="cap-desc" data-i18n="cap6_desc">Real-time KPI dashboards with pluggable widgets, threshold-based alerts, automated notifications, and a no-code dashboard builder for any team.</div>
+      <div class="cap-tags">
+        <span class="cap-tag">KPI Monitoring</span><span class="cap-tag">Alerts</span>
+        <span class="cap-tag">Dashboard Builder</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLATFORM SCREENSHOTS -->
+<section class="screenshots" id="platform">
+  <div class="section-tag" data-i18n="sc_tag">Platform in Action</div>
+  <h2 class="section-title reveal" data-i18n="sc_title">See the platform at work</h2>
+  <p class="section-desc reveal reveal-delay-1" data-i18n="sc_desc">From satellite imagery ingestion to real-time city dashboards — explore the URBOS interface designed for urban operators.</p>
+
+  <!-- Carousel -->
+  <div class="carousel-outer reveal" style="margin-top:3rem;">
+    <div class="carousel-frame">
+      <div class="carousel-track" id="carouselTrack">
+
+        <div class="carousel-slide">
+          <img src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1200&q=85&auto=format&fit=crop" alt="3D City Digital Twin"/>
+          <div class="carousel-caption">
+            <span class="screenshot-badge" data-i18n="sc1_badge">4D Map Engine</span>
+            <div class="carousel-caption-title" data-i18n="sc1_title">3D City Visualization</div>
+            <div class="carousel-caption-desc" data-i18n="sc1_desc">Real-time 3D/4D urban map with live data layers, time-slider controls, and digital twin overlays.</div>
+          </div>
+        </div>
+
+        <div class="carousel-slide">
+          <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=85&auto=format&fit=crop" alt="City Analytics Dashboard"/>
+          <div class="carousel-caption">
+            <span class="screenshot-badge" data-i18n="sc2_badge">Analytics Dashboard</span>
+            <div class="carousel-caption-title" data-i18n="sc2_title">Operational Dashboards</div>
+            <div class="carousel-caption-desc" data-i18n="sc2_desc">Drag-and-drop KPI dashboards with real-time data widgets, charts, and configurable alert panels.</div>
+          </div>
+        </div>
+
+        <div class="carousel-slide">
+          <img src="https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=1200&q=85&auto=format&fit=crop" alt="Satellite Earth Observation"/>
+          <div class="carousel-caption">
+            <span class="screenshot-badge" data-i18n="sc3_badge">Earth Observation</span>
+            <div class="carousel-caption-title" data-i18n="sc3_title">Satellite Imagery Layer</div>
+            <div class="carousel-caption-desc" data-i18n="sc3_desc">Copernicus Sentinel SAR and optical imagery integrated as live, queryable map layers with temporal browsing.</div>
+          </div>
+        </div>
+
+        <div class="carousel-slide">
+          <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=85&auto=format&fit=crop" alt="Urban IoT Sensor Network"/>
+          <div class="carousel-caption">
+            <span class="screenshot-badge" data-i18n="sc4_badge">IoT Monitoring</span>
+            <div class="carousel-caption-title" data-i18n="sc4_title">Smart Sensor Network</div>
+            <div class="carousel-caption-desc" data-i18n="sc4_desc">Live IoT sensor map with real-time telemetry, alert thresholds, and historical trend analysis per device.</div>
+          </div>
+        </div>
+
+        <div class="carousel-slide">
+          <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1200&q=85&auto=format&fit=crop" alt="Flood Risk Simulation"/>
+          <div class="carousel-caption">
+            <span class="screenshot-badge" data-i18n="sc5_badge">Risk Simulation</span>
+            <div class="carousel-caption-title" data-i18n="sc5_title">Flood &amp; Climate Simulation</div>
+            <div class="carousel-caption-desc" data-i18n="sc5_desc">Urban flood risk modeling, heat island analysis, and disaster scenario simulation using AI-powered digital twin engine.</div>
+          </div>
+        </div>
+
+        <div class="carousel-slide">
+          <img src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1200&q=85&auto=format&fit=crop" alt="Infrastructure Digital Twin"/>
+          <div class="carousel-caption">
+            <span class="screenshot-badge" data-i18n="sc6_badge">Infrastructure Twin</span>
+            <div class="carousel-caption-title" data-i18n="sc6_title">Infrastructure Digital Twin</div>
+            <div class="carousel-caption-desc" data-i18n="sc6_desc">BIM-integrated 3D city model with structural health monitoring, lifecycle tracking, and predictive maintenance scoring.</div>
+          </div>
+        </div>
+
+        <div class="carousel-slide">
+          <img src="https://images.unsplash.com/photo-1573804633927-bfcbcd909acd?w=1200&q=85&auto=format&fit=crop" alt="Smart City Traffic Monitoring"/>
+          <div class="carousel-caption">
+            <span class="screenshot-badge" data-i18n="sc7_badge">Traffic &amp; Mobility</span>
+            <div class="carousel-caption-title" data-i18n="sc7_title">Traffic Flow Simulation</div>
+            <div class="carousel-caption-desc" data-i18n="sc7_desc">Real-time traffic monitoring, congestion prediction, and mobility simulation across the urban road network.</div>
+          </div>
+        </div>
+
+        <div class="carousel-slide">
+          <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=85&auto=format&fit=crop" alt="GeoAI Workflow Builder"/>
+          <div class="carousel-caption">
+            <span class="screenshot-badge" data-i18n="sc8_badge">GeoAI Workflows</span>
+            <div class="carousel-caption-title" data-i18n="sc8_title">AI Workflow Builder</div>
+            <div class="carousel-caption-desc" data-i18n="sc8_desc">Visual drag-and-drop pipeline builder for geospatial AI processing, model chaining, and on-demand analysis.</div>
+          </div>
+        </div>
+
+        <div class="carousel-slide">
+          <img src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=1200&q=85&auto=format&fit=crop" alt="Emergency Operations Center"/>
+          <div class="carousel-caption">
+            <span class="screenshot-badge" data-i18n="sc9_badge">Emergency Management</span>
+            <div class="carousel-caption-title" data-i18n="sc9_title">Crisis Operations Center</div>
+            <div class="carousel-caption-desc" data-i18n="sc9_desc">Integrated emergency management dashboard with multi-agency coordination, real-time alerts, and incident tracking.</div>
+          </div>
+        </div>
+
+        <div class="carousel-slide">
+          <img src="https://images.unsplash.com/photo-1444723121867-7a241cacace9?w=1200&q=85&auto=format&fit=crop" alt="Smart City Night View"/>
+          <div class="carousel-caption">
+            <span class="screenshot-badge" data-i18n="sc10_badge">City Overview</span>
+            <div class="carousel-caption-title" data-i18n="sc10_title">Urban Situation Awareness</div>
+            <div class="carousel-caption-desc" data-i18n="sc10_desc">Unified city-wide operational view aggregating all data streams, alerts, and KPIs into a single real-time control room.</div>
+          </div>
+        </div>
+
+      </div><!-- end track -->
+
+      <!-- Prev / Next buttons -->
+      <button class="carousel-btn carousel-btn-prev" id="carouselPrev" aria-label="Previous">&#8592;</button>
+      <button class="carousel-btn carousel-btn-next" id="carouselNext" aria-label="Next">&#8594;</button>
+
+      <!-- Counter -->
+      <div class="carousel-counter"><span id="carouselCurrent">1</span> / <span id="carouselTotal">10</span></div>
+    </div>
+
+    <!-- Dot indicators -->
+    <div class="carousel-dots" id="carouselDots"></div>
+  </div>
+</section>
+
+
+<section class="architecture" id="architecture">
+  <div class="section-tag" data-i18n="arch_tag">Platform Architecture</div>
+  <h2 class="section-title reveal" data-i18n="arch_title">Built for enterprise scale</h2>
+  <p class="section-desc reveal reveal-delay-1" data-i18n="arch_desc">Cloud-native, API-first, multi-tenant architecture with full tenant isolation, horizontal scalability, and role-based access control.</p>
+
+  <div class="arch-diagram reveal">
+    <div class="arch-label mono" data-i18n="arch_layer1">Data Sources</div>
+    <div class="arch-row cols-4">
+      <div class="arch-cell">
+        <div class="arch-cell-title" data-i18n="arch_src1">EO Satellites</div>
+        <div class="arch-cell-items">
+          <div class="arch-cell-item">Sentinel-1/2/3</div>
+          <div class="arch-cell-item">IRIDE</div>
+          <div class="arch-cell-item">SAR / Optical</div>
+        </div>
+      </div>
+      <div class="arch-cell">
+        <div class="arch-cell-title" data-i18n="arch_src2">IoT & Sensors</div>
+        <div class="arch-cell-items">
+          <div class="arch-cell-item">SCADA Systems</div>
+          <div class="arch-cell-item">Weather Services</div>
+          <div class="arch-cell-item">Telemetry Feeds</div>
+        </div>
+      </div>
+      <div class="arch-cell">
+        <div class="arch-cell-title" data-i18n="arch_src3">OGC Services</div>
+        <div class="arch-cell-items">
+          <div class="arch-cell-item">WMS / WFS / WCS</div>
+          <div class="arch-cell-item">WMTS / STAC</div>
+          <div class="arch-cell-item">External APIs</div>
+        </div>
+      </div>
+      <div class="arch-cell">
+        <div class="arch-cell-title" data-i18n="arch_src4">User Data</div>
+        <div class="arch-cell-items">
+          <div class="arch-cell-item">GeoJSON / Shapefile</div>
+          <div class="arch-cell-item">Raster Layers</div>
+          <div class="arch-cell-item">BIM / CityGML</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arch-label mono" data-i18n="arch_layer2">Processing Layer</div>
+    <div class="arch-row cols-3">
+      <div class="arch-cell highlight">
+        <div class="arch-cell-title" data-i18n="arch_proc1">Data Pipeline & ETL</div>
+        <div class="arch-cell-items">
+          <div class="arch-cell-item">Ingestion & Normalization</div>
+          <div class="arch-cell-item">Multi-source Fusion</div>
+          <div class="arch-cell-item">Temporal Alignment</div>
+        </div>
+      </div>
+      <div class="arch-cell highlight">
+        <div class="arch-cell-title" data-i18n="arch_proc2">Geospatial Storage</div>
+        <div class="arch-cell-items">
+          <div class="arch-cell-item">Vector / Raster DB</div>
+          <div class="arch-cell-item">Time Series Store</div>
+          <div class="arch-cell-item">3D City Models</div>
+        </div>
+      </div>
+      <div class="arch-cell highlight">
+        <div class="arch-cell-title" data-i18n="arch_proc3">AI / ML Engine</div>
+        <div class="arch-cell-items">
+          <div class="arch-cell-item">Pattern Analysis</div>
+          <div class="arch-cell-item">Anomaly Detection</div>
+          <div class="arch-cell-item">Simulation Models</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arch-label mono" data-i18n="arch_layer3">Service Layer (API-First)</div>
+    <div class="arch-row cols-4">
+      <div class="arch-cell">
+        <div class="arch-cell-title" data-i18n="arch_svc1">4D Maps</div>
+        <div class="arch-cell-items">
+          <div class="arch-cell-item">3D Visualization</div>
+          <div class="arch-cell-item">Map Builder</div>
+        </div>
+      </div>
+      <div class="arch-cell">
+        <div class="arch-cell-title" data-i18n="arch_svc2">Dashboards</div>
+        <div class="arch-cell-items">
+          <div class="arch-cell-item">KPI Monitoring</div>
+          <div class="arch-cell-item">Widget Builder</div>
+        </div>
+      </div>
+      <div class="arch-cell">
+        <div class="arch-cell-title" data-i18n="arch_svc3">GeoAI Workflows</div>
+        <div class="arch-cell-items">
+          <div class="arch-cell-item">On-demand Analysis</div>
+          <div class="arch-cell-item">Pipeline Builder</div>
+        </div>
+      </div>
+      <div class="arch-cell">
+        <div class="arch-cell-title" data-i18n="arch_svc4">Alerts & Notifications</div>
+        <div class="arch-cell-items">
+          <div class="arch-cell-item">Event Detection</div>
+          <div class="arch-cell-item">Threshold Triggers</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arch-label mono" data-i18n="arch_layer4">Multi-Tenant SaaS Infrastructure</div>
+    <div class="arch-row cols-3">
+      <div class="arch-cell">
+        <div class="arch-cell-title" data-i18n="arch_inf1">Tenant Isolation</div>
+        <div class="arch-cell-items">
+          <div class="arch-cell-item">RBAC</div>
+          <div class="arch-cell-item">Isolated Datasets</div>
+          <div class="arch-cell-item">Config Environments</div>
+        </div>
+      </div>
+      <div class="arch-cell">
+        <div class="arch-cell-title" data-i18n="arch_inf2">Scalability</div>
+        <div class="arch-cell-items">
+          <div class="arch-cell-item">Horizontal Scaling</div>
+          <div class="arch-cell-item">Cloud-Native</div>
+          <div class="arch-cell-item">Usage Metering</div>
+        </div>
+      </div>
+      <div class="arch-cell">
+        <div class="arch-cell-title" data-i18n="arch_inf3">Subscriptions</div>
+        <div class="arch-cell-items">
+          <div class="arch-cell-item">Tiered Plans</div>
+          <div class="arch-cell-item">API-First Access</div>
+          <div class="arch-cell-item">Modular Services</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ANALYTICS -->
+<section class="analytics" id="analytics">
+  <div class="section-tag" data-i18n="ana_tag">Decision Support</div>
+  <h2 class="section-title reveal" data-i18n="ana_title">Intelligence at city scale</h2>
+  <p class="section-desc reveal reveal-delay-1" data-i18n="ana_desc">From real-time situational awareness to predictive maintenance and emergency management — URBOS transforms raw urban data into actionable intelligence.</p>
+
+  <div class="analytics-grid">
+    <div class="analytics-features">
+      <div class="feature-item reveal">
+        <div class="feature-item-icon">🎯</div>
+        <div class="feature-item-content">
+          <div class="feature-item-title" data-i18n="feat1_title">Situation Awareness</div>
+          <div class="feature-item-desc" data-i18n="feat1_desc">Real-time operational control room providing a unified view of all urban systems and critical infrastructure in a single pane of glass.</div>
+        </div>
+      </div>
+      <div class="feature-item reveal reveal-delay-1">
+        <div class="feature-item-icon">🚨</div>
+        <div class="feature-item-content">
+          <div class="feature-item-title" data-i18n="feat2_title">Emergency Management</div>
+          <div class="feature-item-desc" data-i18n="feat2_desc">Disaster monitoring, risk assessment, and crisis response coordination tools for real-time emergency scenarios and multi-agency workflows.</div>
+        </div>
+      </div>
+      <div class="feature-item reveal reveal-delay-2">
+        <div class="feature-item-icon">🔮</div>
+        <div class="feature-item-content">
+          <div class="feature-item-title" data-i18n="feat3_title">Urban Simulation</div>
+          <div class="feature-item-desc" data-i18n="feat3_desc">Model traffic flows, energy demand, environmental phenomena, infrastructure performance, and disaster scenarios with high-fidelity digital twin simulations.</div>
+        </div>
+      </div>
+      <div class="feature-item reveal reveal-delay-3">
+        <div class="feature-item-icon">🔧</div>
+        <div class="feature-item-content">
+          <div class="feature-item-title" data-i18n="feat4_title">Predictive Maintenance</div>
+          <div class="feature-item-desc" data-i18n="feat4_desc">Reduce OPEX with AI-driven predictive maintenance, infrastructure lifecycle optimization, and intelligent resource allocation recommendations.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Mockup -->
+    <div class="dashboard-mock reveal">
+      <div class="dash-header">
+        <div class="dash-header-left">
+          <span style="font-size:14px">🏙️</span>
+          <div class="dash-header-title" data-i18n="dash_title">City Operations</div>
+        </div>
+        <div class="dash-status mono" data-i18n="dash_status">● LIVE</div>
+      </div>
+      <div class="dash-body">
+        <div class="dash-kpi-row">
+          <div class="kpi">
+            <div class="kpi-val">98.1%</div>
+            <div class="kpi-label mono" data-i18n="kpi1">Grid Health</div>
+            <div class="kpi-delta">+0.3% ↑</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-val">34°C</div>
+            <div class="kpi-label mono" data-i18n="kpi2">Urban Heat</div>
+            <div class="kpi-delta" style="color:#ffbd2e">+2.1° ↑</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-val">71%</div>
+            <div class="kpi-label mono" data-i18n="kpi3">Air Quality</div>
+            <div class="kpi-delta">stable —</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-val">4.2k</div>
+            <div class="kpi-label mono" data-i18n="kpi4">Active Sensors</div>
+            <div class="kpi-delta">+18 ↑</div>
+          </div>
+        </div>
+
+        <div class="mini-chart">
+          <div class="mini-chart-title mono" data-i18n="chart_title">ENERGY DEMAND — 24H</div>
+          <div class="bar-chart">
+            <div class="bar" style="height:45%"></div>
+            <div class="bar" style="height:38%"></div>
+            <div class="bar" style="height:55%"></div>
+            <div class="bar" style="height:62%"></div>
+            <div class="bar" style="height:80%"></div>
+            <div class="bar" style="height:95%"></div>
+            <div class="bar" style="height:88%"></div>
+            <div class="bar" style="height:72%"></div>
+            <div class="bar" style="height:65%"></div>
+            <div class="bar" style="height:58%"></div>
+            <div class="bar" style="height:70%"></div>
+            <div class="bar" style="height:76%"></div>
+          </div>
+        </div>
+
+        <div class="alerts-list">
+          <div class="alert-item">
+            <div class="alert-dot warn"></div>
+            <span data-i18n="alert1">Traffic — Zone B3 congestion above threshold</span>
+          </div>
+          <div class="alert-item">
+            <div class="alert-dot info"></div>
+            <span data-i18n="alert2">Flood risk model updated — District 4</span>
+          </div>
+          <div class="alert-item">
+            <div class="alert-dot ok"></div>
+            <span data-i18n="alert3">Sensor grid maintenance complete — 99.1% online</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- USE CASES -->
+<section class="usecases" id="usecases">
+  <div class="section-tag" data-i18n="uc_tag">Use Cases</div>
+  <h2 class="section-title reveal" data-i18n="uc_title">Built for every urban domain</h2>
+  <p class="section-desc reveal reveal-delay-1" data-i18n="uc_desc">From smart city operations to utility management and disaster response — URBOS serves every urban operator with a tailored, modular experience.</p>
+
+  <div class="usecases-grid">
+    <div class="usecase-card reveal">
+      <span class="usecase-icon">🏛️</span>
+      <div class="usecase-title" data-i18n="uc1_title">Municipality & PA</div>
+      <div class="usecase-desc" data-i18n="uc1_desc">City planning, regulatory monitoring, environmental compliance, and citizen services backed by real-time urban intelligence and simulation.</div>
+    </div>
+    <div class="usecase-card reveal reveal-delay-1">
+      <span class="usecase-icon">⚡</span>
+      <div class="usecase-title" data-i18n="uc2_title">Utility Operators</div>
+      <div class="usecase-desc" data-i18n="uc2_desc">Monitor electricity, water, and gas grids in real time. Predict failures, optimize maintenance schedules, and ensure service continuity.</div>
+    </div>
+    <div class="usecase-card reveal reveal-delay-2">
+      <span class="usecase-icon">🚦</span>
+      <div class="usecase-title" data-i18n="uc3_title">Transport & Mobility</div>
+      <div class="usecase-desc" data-i18n="uc3_desc">Traffic simulation, congestion forecasting, public transport optimization, and mobility-as-a-service analytics on a unified platform.</div>
+    </div>
+    <div class="usecase-card reveal reveal-delay-3">
+      <span class="usecase-icon">🌿</span>
+      <div class="usecase-title" data-i18n="uc4_title">Environment & Climate</div>
+      <div class="usecase-desc" data-i18n="uc4_desc">Air quality monitoring, urban heat island analysis, flood risk modeling, and climate resilience planning with satellite and sensor data.</div>
+    </div>
+    <div class="usecase-card reveal reveal-delay-1">
+      <span class="usecase-icon">🏗️</span>
+      <div class="usecase-title" data-i18n="uc5_title">Infrastructure</div>
+      <div class="usecase-desc" data-i18n="uc5_desc">BIM integration, structural health monitoring, infrastructure lifecycle management, and construction site monitoring with 3D city models.</div>
+    </div>
+    <div class="usecase-card reveal reveal-delay-2">
+      <span class="usecase-icon">🚒</span>
+      <div class="usecase-title" data-i18n="uc6_title">Emergency Services</div>
+      <div class="usecase-desc" data-i18n="uc6_desc">Integrated crisis management platform for civil protection, fire brigades, and first responders with real-time situational awareness.</div>
+    </div>
+  </div>
+</section>
+
+<!-- INTEGRATIONS -->
+<section class="integrations">
+  <div class="section-tag" data-i18n="int_tag">Integrations & Standards</div>
+  <h2 class="section-title reveal" data-i18n="int_title">Open by design</h2>
+  <p class="section-desc reveal reveal-delay-1" data-i18n="int_desc">URBOS is built on open standards and integrates with the tools and data sources your team already uses. No lock-in, full interoperability.</p>
+
+  <div class="int-row reveal">
+    <div class="int-badge"><span class="int-icon">🛰️</span> Copernicus / ESA</div>
+    <div class="int-badge"><span class="int-icon">🗺️</span> OGC Standards</div>
+    <div class="int-badge"><span class="int-icon">📦</span> STAC Catalog</div>
+    <div class="int-badge"><span class="int-icon">🌐</span> WMS / WFS / WMTS</div>
+    <div class="int-badge"><span class="int-icon">🏗️</span> IFC / BIM</div>
+    <div class="int-badge"><span class="int-icon">📊</span> GeoJSON / Shapefile</div>
+    <div class="int-badge"><span class="int-icon">☁️</span> AWS / Azure / GCP</div>
+    <div class="int-badge"><span class="int-icon">🔗</span> REST / GraphQL API</div>
+    <div class="int-badge"><span class="int-icon">📡</span> MQTT / Kafka</div>
+    <div class="int-badge"><span class="int-icon">🌍</span> CityGML / 3D Tiles</div>
+    <div class="int-badge"><span class="int-icon">🔒</span> OAuth 2.0 / SSO</div>
+    <div class="int-badge"><span class="int-icon">📈</span> Prometheus / Grafana</div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="section-tag" data-i18n="price_tag">Pricing</div>
+  <h2 class="section-title reveal" data-i18n="price_title">Plans for every city</h2>
+  <p class="section-desc reveal reveal-delay-1" data-i18n="price_desc">From pilot projects to full metropolitan deployments. Flexible, transparent pricing that scales with your city's needs.</p>
+
+  <div class="pricing-grid pricing-grid-4">
+    <div class="plan reveal">
+      <div class="plan-name" data-i18n="plan0_name">Free</div>
+      <div class="plan-price">€0 <span data-i18n="per_month">/month</span></div>
+      <div class="plan-desc" data-i18n="plan0_desc">Explore URBOS with no commitment. Perfect for developers, researchers, and small teams evaluating the platform.</div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li data-i18n="pf0_1">1 data source integration</li>
+        <li data-i18n="pf0_2">2D map viewer (read-only)</li>
+        <li data-i18n="pf0_3">Sample city dataset included</li>
+        <li data-i18n="pf0_4">Basic dashboard (3 widgets)</li>
+        <li data-i18n="pf0_5">Community support</li>
+        <li data-i18n="pf0_6">2 user seats</li>
+        <li class="disabled" data-i18n="pf0_7">Real-time data streams</li>
+        <li class="disabled" data-i18n="pf0_8">AI/ML & simulations</li>
+      </ul>
+      <button class="btn-plan outline" data-i18n="btn_free">Start for Free</button>
+    </div>
+
+    <div class="plan reveal reveal-delay-1">
+      <div class="plan-name" data-i18n="plan1_name">Starter</div>
+      <div class="plan-price">€490 <span data-i18n="per_month">/month</span></div>
+      <div class="plan-desc" data-i18n="plan1_desc">Ideal for pilot programs and small municipalities. Get started with core monitoring and visualization capabilities.</div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li data-i18n="pf1_1">Up to 3 data source integrations</li>
+        <li data-i18n="pf1_2">2D/3D Map viewer (read-only)</li>
+        <li data-i18n="pf1_3">Pre-built operational dashboard</li>
+        <li data-i18n="pf1_4">Basic alerting system</li>
+        <li data-i18n="pf1_5">OGC service connection</li>
+        <li data-i18n="pf1_6">5 user seats</li>
+        <li class="disabled" data-i18n="pf1_7">AI/ML Analytics</li>
+        <li class="disabled" data-i18n="pf1_8">Custom simulations</li>
+      </ul>
+      <button class="btn-plan outline" data-i18n="btn_start">Get Started</button>
+    </div>
+
+    <div class="plan featured reveal reveal-delay-2">
+      <div class="plan-badge" data-i18n="plan2_badge">Most Popular</div>
+      <div class="plan-name" data-i18n="plan2_name">Professional</div>
+      <div class="plan-price">€1,990 <span data-i18n="per_month">/month</span></div>
+      <div class="plan-desc" data-i18n="plan2_desc">For medium-sized cities and infrastructure operators requiring full real-time analytics and AI capabilities.</div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li data-i18n="pf2_1">Unlimited data source integrations</li>
+        <li data-i18n="pf2_2">4D interactive map builder</li>
+        <li data-i18n="pf2_3">Custom dashboard & widget builder</li>
+        <li data-i18n="pf2_4">GeoAI workflow builder</li>
+        <li data-i18n="pf2_5">Predictive analytics & anomaly detection</li>
+        <li data-i18n="pf2_6">Urban simulation models</li>
+        <li data-i18n="pf2_7">Advanced alerting & notifications</li>
+        <li data-i18n="pf2_8">25 user seats + API access</li>
+      </ul>
+      <button class="btn-plan solid" data-i18n="btn_start">Get Started</button>
+    </div>
+
+    <div class="plan reveal reveal-delay-3">
+      <div class="plan-name" data-i18n="plan3_name">Enterprise</div>
+      <div class="plan-price" data-i18n="plan3_price">Custom</div>
+      <div class="plan-desc" data-i18n="plan3_desc">For metropolitan areas, national agencies, and multi-city deployments requiring full SaaS capabilities, custom integrations, and dedicated support.</div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li data-i18n="pf3_1">All Professional features</li>
+        <li data-i18n="pf3_2">Multi-city / multi-tenant deployment</li>
+        <li data-i18n="pf3_3">Dedicated cloud infrastructure</li>
+        <li data-i18n="pf3_4">Custom AI model development</li>
+        <li data-i18n="pf3_5">On-premise or private cloud option</li>
+        <li data-i18n="pf3_6">SLA & dedicated support team</li>
+        <li data-i18n="pf3_7">Unlimited seats & API calls</li>
+        <li data-i18n="pf3_8">Training & onboarding included</li>
+      </ul>
+      <button class="btn-plan outline" data-i18n="btn_contact">Contact Sales</button>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="section-tag" style="justify-content:center" data-i18n="cta_tag">Get Started Today</div>
+  <h2 class="cta-title reveal" data-i18n="cta_title">Start building the city of tomorrow</h2>
+  <p class="cta-desc reveal reveal-delay-1" data-i18n="cta_desc">Join municipalities, utilities, and infrastructure operators across Europe already running on URBOS.</p>
+  <div class="cta-actions reveal reveal-delay-2">
+    <a href="#" class="btn-primary"><span data-i18n="cta_btn1">Request a Demo</span> →</a>
+    <a href="#pricing" class="btn-secondary"><span data-i18n="cta_btn2">View Pricing</span></a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <a href="#" class="nav-logo" style="display:inline-flex; margin-bottom:0.75rem;">
+        <div class="nav-logo-mark">U</div>
+        <span class="nav-logo-text">URB<span>OS</span></span>
+      </a>
+      <p class="footer-brand-desc" data-i18n="footer_desc">The City Urban Operating System. A SaaS platform for real-time city monitoring, simulation, analytics, and decision support.</p>
+    </div>
+    <div>
+      <div class="footer-col-title" data-i18n="footer_col1">Platform</div>
+      <ul class="footer-links">
+        <li><a href="#" data-i18n="fp_maps">4D Maps</a></li>
+        <li><a href="#" data-i18n="fp_dash">Dashboards</a></li>
+        <li><a href="#" data-i18n="fp_geoai">GeoAI Workflows</a></li>
+        <li><a href="#" data-i18n="fp_alerts">Alerts</a></li>
+        <li><a href="#" data-i18n="fp_api">API Reference</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title" data-i18n="footer_col2">Solutions</div>
+      <ul class="footer-links">
+        <li><a href="#" data-i18n="fs_muni">Municipalities</a></li>
+        <li><a href="#" data-i18n="fs_util">Utilities</a></li>
+        <li><a href="#" data-i18n="fs_trans">Transport</a></li>
+        <li><a href="#" data-i18n="fs_env">Environment</a></li>
+        <li><a href="#" data-i18n="fs_emerg">Emergency</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title" data-i18n="footer_col3">Company</div>
+      <ul class="footer-links">
+        <li><a href="#" data-i18n="fc_about">About</a></li>
+        <li><a href="#" data-i18n="fc_blog">Blog</a></li>
+        <li><a href="#" data-i18n="fc_careers">Careers</a></li>
+        <li><a href="#" data-i18n="fc_contact">Contact</a></li>
+        <li><a href="#" data-i18n="fc_docs">Documentation</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 URBOS — Urban Operating System. All rights reserved.</div>
+    <div class="footer-legal">
+      <a href="#" data-i18n="fl_privacy">Privacy Policy</a>
+      <a href="#" data-i18n="fl_terms">Terms of Service</a>
+      <a href="#" data-i18n="fl_cookies">Cookie Policy</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── i18n ──
+const translations = {
+  en: {
+    nav_capabilities: "Capabilities", nav_architecture: "Architecture", nav_analytics: "Analytics",
+    nav_usecases: "Use Cases", nav_pricing: "Pricing", nav_demo: "Request Demo",
+    hero_badge: "City Urban Operating System — SaaS Platform",
+    hero_title_html: 'The <span class="accent">Digital Twin</span><br>for the <span class="accent-2">Modern City</span>',
+    hero_desc: "Real-time monitoring, simulation, and AI-powered analytics for municipalities, utilities, and infrastructure operators — delivered as a scalable multi-tenant platform.",
+    hero_cta1: "Start Free Trial", hero_cta2: "Explore Platform",
+    stat_maps: "Interactive Maps", stat_stream: "Real-Time Streams", stat_models: "Predictive Models", stat_standards: "Standards Compliant",
+    metric_uptime: "Uptime", metric_sensors: "Sensors", metric_latency: "Latency",
+    hero_panel_alert: "LIVE · Traffic anomaly detected — Zone B3 · Alert #4821",
+    caps_tag: "Core Capabilities", caps_title: "Everything you need to manage a city",
+    caps_desc: "A unified platform for data ingestion, analysis, simulation, and decision support — designed for the complexity of modern urban environments.",
+    cap1_title: "Earth Observation Data", cap1_desc: "Ingest satellite EO data from Copernicus Sentinel-1/2/3 and IRIDE. SAR and optical imagery processing, fully integrated into the data pipeline.",
+    cap2_title: "Real-Time IoT & SCADA", cap2_desc: "Connect in-situ sensors, IoT devices, SCADA systems, weather services, and real-time telemetry feeds for continuous urban monitoring.",
+    cap3_title: "OGC Geospatial Services", cap3_desc: "Full compliance with OGC standards. Connect WMS, WFS, WCS, WMTS, and STAC catalogs seamlessly with the platform's ingestion layer.",
+    cap4_title: "4D Interactive Maps", cap4_desc: "Web-based 3D/4D geospatial visualization with time-enabled urban data layers, digital twin integration, and a no-code map builder with pluggable widgets.",
+    cap5_title: "GeoAI & Predictive Models", cap5_desc: "ML models for urban pattern analysis, anomaly detection, and predictive analytics for infrastructure and environmental monitoring via a visual workflow builder.",
+    cap6_title: "Operational Dashboards", cap6_desc: "Real-time KPI dashboards with pluggable widgets, threshold-based alerts, automated notifications, and a no-code dashboard builder for any team.",
+    arch_tag: "Platform Architecture", arch_title: "Built for enterprise scale",
+    arch_desc: "Cloud-native, API-first, multi-tenant architecture with full tenant isolation, horizontal scalability, and role-based access control.",
+    arch_layer1: "Data Sources", arch_layer2: "Processing Layer", arch_layer3: "Service Layer (API-First)", arch_layer4: "Multi-Tenant SaaS Infrastructure",
+    arch_src1: "EO Satellites", arch_src2: "IoT & Sensors", arch_src3: "OGC Services", arch_src4: "User Data",
+    arch_proc1: "Data Pipeline & ETL", arch_proc2: "Geospatial Storage", arch_proc3: "AI / ML Engine",
+    arch_svc1: "4D Maps", arch_svc2: "Dashboards", arch_svc3: "GeoAI Workflows", arch_svc4: "Alerts & Notifications",
+    arch_inf1: "Tenant Isolation", arch_inf2: "Scalability", arch_inf3: "Subscriptions",
+    ana_tag: "Decision Support", ana_title: "Intelligence at city scale",
+    ana_desc: "From real-time situational awareness to predictive maintenance and emergency management — URBOS transforms raw urban data into actionable intelligence.",
+    feat1_title: "Situation Awareness", feat1_desc: "Real-time operational control room providing a unified view of all urban systems and critical infrastructure in a single pane of glass.",
+    feat2_title: "Emergency Management", feat2_desc: "Disaster monitoring, risk assessment, and crisis response coordination tools for real-time emergency scenarios and multi-agency workflows.",
+    feat3_title: "Urban Simulation", feat3_desc: "Model traffic flows, energy demand, environmental phenomena, infrastructure performance, and disaster scenarios with high-fidelity digital twin simulations.",
+    feat4_title: "Predictive Maintenance", feat4_desc: "Reduce OPEX with AI-driven predictive maintenance, infrastructure lifecycle optimization, and intelligent resource allocation recommendations.",
+    dash_title: "City Operations", dash_status: "● LIVE",
+    kpi1: "Grid Health", kpi2: "Urban Heat", kpi3: "Air Quality", kpi4: "Active Sensors",
+    chart_title: "ENERGY DEMAND — 24H",
+    alert1: "Traffic — Zone B3 congestion above threshold",
+    alert2: "Flood risk model updated — District 4",
+    alert3: "Sensor grid maintenance complete — 99.1% online",
+    uc_tag: "Use Cases", uc_title: "Built for every urban domain",
+    uc_desc: "From smart city operations to utility management and disaster response — URBOS serves every urban operator with a tailored, modular experience.",
+    uc1_title: "Municipality & PA", uc1_desc: "City planning, regulatory monitoring, environmental compliance, and citizen services backed by real-time urban intelligence and simulation.",
+    uc2_title: "Utility Operators", uc2_desc: "Monitor electricity, water, and gas grids in real time. Predict failures, optimize maintenance schedules, and ensure service continuity.",
+    uc3_title: "Transport & Mobility", uc3_desc: "Traffic simulation, congestion forecasting, public transport optimization, and mobility-as-a-service analytics on a unified platform.",
+    uc4_title: "Environment & Climate", uc4_desc: "Air quality monitoring, urban heat island analysis, flood risk modeling, and climate resilience planning with satellite and sensor data.",
+    uc5_title: "Infrastructure", uc5_desc: "BIM integration, structural health monitoring, infrastructure lifecycle management, and construction site monitoring with 3D city models.",
+    uc6_title: "Emergency Services", uc6_desc: "Integrated crisis management platform for civil protection, fire brigades, and first responders with real-time situational awareness.",
+    int_tag: "Integrations & Standards", int_title: "Open by design",
+    int_desc: "URBOS is built on open standards and integrates with the tools and data sources your team already uses. No lock-in, full interoperability.",
+    sc_tag: "Platform in Action", sc_title: "See the platform at work",
+    sc_desc: "From satellite imagery ingestion to real-time city dashboards — explore the URBOS interface designed for urban operators.",
+    sc_video_label: "urbos://platform-demo — walkthrough",
+    sc1_badge: "4D Map Engine", sc1_title: "3D City Visualization", sc1_desc: "Real-time 3D/4D urban map with live data layers, time-slider controls, and digital twin overlays.",
+    sc2_badge: "Analytics Dashboard", sc2_title: "Operational Dashboards", sc2_desc: "Drag-and-drop KPI dashboards with real-time data widgets, charts, and configurable alert panels.",
+    sc3_badge: "Earth Observation", sc3_title: "Satellite Imagery Layer", sc3_desc: "Copernicus Sentinel SAR and optical imagery integrated as live, queryable map layers with temporal browsing.",
+    sc4_badge: "IoT Monitoring", sc4_title: "Smart Sensor Network", sc4_desc: "Live IoT sensor map with real-time telemetry, alert thresholds, and historical trend analysis per device.",
+    sc5_badge: "Risk Simulation", sc5_title: "Flood & Climate Simulation", sc5_desc: "Urban flood risk modeling, heat island analysis, and disaster scenario simulation using AI-powered digital twin engine.",
+    sc6_badge: "Infrastructure Twin", sc6_title: "Infrastructure Digital Twin", sc6_desc: "BIM-integrated 3D city model with structural health monitoring, lifecycle tracking, and predictive maintenance scoring.",
+    sc7_badge: "Traffic & Mobility", sc7_title: "Traffic Flow Simulation", sc7_desc: "Real-time traffic monitoring, congestion prediction, and mobility simulation across the urban road network.",
+    sc8_badge: "GeoAI Workflows", sc8_title: "AI Workflow Builder", sc8_desc: "Visual drag-and-drop pipeline builder for geospatial AI processing, model chaining, and on-demand analysis.",
+    sc9_badge: "Emergency Management", sc9_title: "Crisis Operations Center", sc9_desc: "Integrated emergency management dashboard with multi-agency coordination, real-time alerts, and incident tracking.",
+    sc10_badge: "City Overview", sc10_title: "Urban Situation Awareness", sc10_desc: "Unified city-wide operational view aggregating all data streams, alerts, and KPIs into a single real-time control room.",
+    price_tag: "Pricing", price_title: "Plans for every city",
+    price_desc: "From pilot projects to full metropolitan deployments. Flexible, transparent pricing that scales with your city's needs.",
+    plan1_name: "Starter", per_month: "/month",
+    plan0_name: "Free", plan0_desc: "Explore URBOS with no commitment. Perfect for developers, researchers, and small teams evaluating the platform.",
+    pf0_1: "1 data source integration", pf0_2: "2D map viewer (read-only)", pf0_3: "Sample city dataset included",
+    pf0_4: "Basic dashboard (3 widgets)", pf0_5: "Community support", pf0_6: "2 user seats",
+    pf0_7: "Real-time data streams", pf0_8: "AI/ML & simulations",
+    btn_free: "Start for Free",
+    plan1_desc: "Ideal for pilot programs and small municipalities. Get started with core monitoring and visualization capabilities.",
+    pf1_1: "Up to 3 data source integrations", pf1_2: "2D/3D Map viewer (read-only)", pf1_3: "Pre-built operational dashboard",
+    pf1_4: "Basic alerting system", pf1_5: "OGC service connection", pf1_6: "5 user seats",
+    pf1_7: "AI/ML Analytics", pf1_8: "Custom simulations",
+    plan2_badge: "Most Popular", plan2_name: "Professional",
+    plan2_desc: "For medium-sized cities and infrastructure operators requiring full real-time analytics and AI capabilities.",
+    pf2_1: "Unlimited data source integrations", pf2_2: "4D interactive map builder", pf2_3: "Custom dashboard & widget builder",
+    pf2_4: "GeoAI workflow builder", pf2_5: "Predictive analytics & anomaly detection", pf2_6: "Urban simulation models",
+    pf2_7: "Advanced alerting & notifications", pf2_8: "25 user seats + API access",
+    plan3_name: "Enterprise", plan3_price: "Custom",
+    plan3_desc: "For metropolitan areas, national agencies, and multi-city deployments requiring full SaaS capabilities, custom integrations, and dedicated support.",
+    pf3_1: "All Professional features", pf3_2: "Multi-city / multi-tenant deployment", pf3_3: "Dedicated cloud infrastructure",
+    pf3_4: "Custom AI model development", pf3_5: "On-premise or private cloud option", pf3_6: "SLA & dedicated support team",
+    pf3_7: "Unlimited seats & API calls", pf3_8: "Training & onboarding included",
+    btn_start: "Get Started", btn_contact: "Contact Sales",
+    cta_tag: "Get Started Today", cta_title: "Start building the city of tomorrow",
+    cta_desc: "Join municipalities, utilities, and infrastructure operators across Europe already running on URBOS.",
+    cta_btn1: "Request a Demo", cta_btn2: "View Pricing",
+    footer_desc: "The City Urban Operating System. A SaaS platform for real-time city monitoring, simulation, analytics, and decision support.",
+    footer_col1: "Platform", footer_col2: "Solutions", footer_col3: "Company",
+    fp_maps: "4D Maps", fp_dash: "Dashboards", fp_geoai: "GeoAI Workflows", fp_alerts: "Alerts", fp_api: "API Reference",
+    fs_muni: "Municipalities", fs_util: "Utilities", fs_trans: "Transport", fs_env: "Environment", fs_emerg: "Emergency",
+    fc_about: "About", fc_blog: "Blog", fc_careers: "Careers", fc_contact: "Contact", fc_docs: "Documentation",
+    fl_privacy: "Privacy Policy", fl_terms: "Terms of Service", fl_cookies: "Cookie Policy"
+  },
+  it: {
+    nav_capabilities: "Funzionalità", nav_architecture: "Architettura", nav_analytics: "Analytics",
+    nav_usecases: "Casi d'uso", nav_pricing: "Prezzi", nav_demo: "Richiedi Demo",
+    hero_badge: "Sistema Operativo Urbano — Piattaforma SaaS",
+    hero_title_html: 'Il <span class="accent">Digital Twin</span><br>per la <span class="accent-2">Città Moderna</span>',
+    hero_desc: "Monitoraggio in tempo reale, simulazione e analisi AI per comuni, utilities e operatori infrastrutturali — su una piattaforma SaaS multi-tenant scalabile.",
+    hero_cta1: "Inizia la prova gratuita", hero_cta2: "Esplora la piattaforma",
+    stat_maps: "Mappe Interattive", stat_stream: "Stream Real-Time", stat_models: "Modelli Predittivi", stat_standards: "Standard OGC",
+    metric_uptime: "Disponibilità", metric_sensors: "Sensori", metric_latency: "Latenza",
+    hero_panel_alert: "LIVE · Anomalia traffico rilevata — Zona B3 · Allerta #4821",
+    caps_tag: "Funzionalità Principali", caps_title: "Tutto ciò che serve per gestire una città",
+    caps_desc: "Una piattaforma unificata per l'acquisizione dati, l'analisi, la simulazione e il supporto decisionale — progettata per la complessità degli ambienti urbani moderni.",
+    cap1_title: "Dati di Osservazione della Terra", cap1_desc: "Acquisizione dati satellite EO da Copernicus Sentinel-1/2/3 e IRIDE. Elaborazione immagini SAR e ottiche, pienamente integrata nella pipeline dati.",
+    cap2_title: "IoT & SCADA Real-Time", cap2_desc: "Connetti sensori in-situ, dispositivi IoT, sistemi SCADA, servizi meteorologici e feed telemetrici in tempo reale per il monitoraggio urbano continuo.",
+    cap3_title: "Servizi Geospaziali OGC", cap3_desc: "Piena conformità agli standard OGC. Collegamento trasparente con WMS, WFS, WCS, WMTS e cataloghi STAC nel layer di ingestione.",
+    cap4_title: "Mappe Interattive 4D", cap4_desc: "Visualizzazione geospaziale 3D/4D web-based con layer urbani abilitati al tempo, integrazione digital twin e un map builder no-code con widget configurabili.",
+    cap5_title: "GeoAI & Modelli Predittivi", cap5_desc: "Modelli ML per l'analisi dei pattern urbani, rilevamento anomalie e analisi predittiva per infrastrutture e monitoraggio ambientale tramite workflow builder visuale.",
+    cap6_title: "Dashboard Operative", cap6_desc: "Dashboard KPI in tempo reale con widget configurabili, alert a soglia, notifiche automatizzate e un dashboard builder no-code per qualsiasi team.",
+    arch_tag: "Architettura della Piattaforma", arch_title: "Progettata per scala enterprise",
+    arch_desc: "Architettura cloud-native, API-first, multi-tenant con isolamento completo dei tenant, scalabilità orizzontale e controllo accessi basato sui ruoli.",
+    arch_layer1: "Sorgenti Dati", arch_layer2: "Livello di Elaborazione", arch_layer3: "Livello di Servizio (API-First)", arch_layer4: "Infrastruttura SaaS Multi-Tenant",
+    arch_src1: "Satelliti EO", arch_src2: "IoT & Sensori", arch_src3: "Servizi OGC", arch_src4: "Dati Utente",
+    arch_proc1: "Pipeline Dati & ETL", arch_proc2: "Storage Geospaziale", arch_proc3: "Engine AI / ML",
+    arch_svc1: "Mappe 4D", arch_svc2: "Dashboard", arch_svc3: "Workflow GeoAI", arch_svc4: "Alert & Notifiche",
+    arch_inf1: "Isolamento Tenant", arch_inf2: "Scalabilità", arch_inf3: "Abbonamenti",
+    ana_tag: "Supporto Decisionale", ana_title: "Intelligenza a scala urbana",
+    ana_desc: "Dalla consapevolezza situazionale in tempo reale alla manutenzione predittiva e gestione delle emergenze — URBOS trasforma i dati urbani in intelligenza operativa.",
+    feat1_title: "Situational Awareness", feat1_desc: "Sala di controllo operativa in tempo reale per una visione unificata di tutti i sistemi urbani e infrastrutture critiche in un unico pannello.",
+    feat2_title: "Gestione delle Emergenze", feat2_desc: "Strumenti di monitoraggio catastrofi, valutazione del rischio e coordinamento della risposta alle crisi per scenari emergenziali in tempo reale.",
+    feat3_title: "Simulazione Urbana", feat3_desc: "Modellazione di flussi di traffico, domanda energetica, fenomeni ambientali, performance infrastrutturale e scenari di disastro con simulazioni digital twin ad alta fedeltà.",
+    feat4_title: "Manutenzione Predittiva", feat4_desc: "Riduci l'OPEX con manutenzione predittiva AI-driven, ottimizzazione del ciclo di vita delle infrastrutture e raccomandazioni intelligenti per l'allocazione delle risorse.",
+    dash_title: "Operazioni Città", dash_status: "● IN DIRETTA",
+    kpi1: "Salute Rete", kpi2: "Calore Urbano", kpi3: "Qualità Aria", kpi4: "Sensori Attivi",
+    chart_title: "DOMANDA ENERGETICA — 24H",
+    alert1: "Traffico — Congestione Zona B3 oltre soglia",
+    alert2: "Modello rischio alluvione aggiornato — Distretto 4",
+    alert3: "Manutenzione rete sensori completata — 99.1% online",
+    uc_tag: "Casi d'uso", uc_title: "Per ogni dominio urbano",
+    uc_desc: "Dalle operazioni smart city alla gestione delle utilities e risposta alle emergenze — URBOS serve ogni operatore urbano con un'esperienza modulare e personalizzata.",
+    uc1_title: "Comuni & PA", uc1_desc: "Pianificazione urbana, monitoraggio normativo, conformità ambientale e servizi ai cittadini supportati da intelligenza urbana in tempo reale.",
+    uc2_title: "Operatori Utility", uc2_desc: "Monitoraggio in tempo reale di reti elettriche, idriche e del gas. Previsione guasti, ottimizzazione manutenzioni e continuità del servizio.",
+    uc3_title: "Trasporti & Mobilità", uc3_desc: "Simulazione traffico, previsione congestione, ottimizzazione trasporto pubblico e analisi mobility-as-a-service su un'unica piattaforma.",
+    uc4_title: "Ambiente & Clima", uc4_desc: "Monitoraggio qualità dell'aria, analisi isole di calore urbane, modellazione rischio alluvione e pianificazione della resilienza climatica.",
+    uc5_title: "Infrastrutture", uc5_desc: "Integrazione BIM, monitoraggio strutturale, gestione del ciclo di vita infrastrutturale e monitoraggio cantieri con modelli 3D della città.",
+    uc6_title: "Servizi di Emergenza", uc6_desc: "Piattaforma integrata di gestione crisi per protezione civile, vigili del fuoco e first responder con situational awareness in tempo reale.",
+    int_tag: "Integrazioni & Standard", int_title: "Aperto by design",
+    int_desc: "URBOS è costruito su standard aperti e si integra con gli strumenti e le sorgenti dati già utilizzati dal tuo team. Nessun vendor lock-in, piena interoperabilità.",
+    sc_tag: "La Piattaforma in Azione", sc_title: "Scopri la piattaforma",
+    sc_desc: "Dall'acquisizione di immagini satellitari alle dashboard urbane in tempo reale — esplora l'interfaccia URBOS progettata per gli operatori urbani.",
+    sc_video_label: "urbos://platform-demo — walkthrough",
+    sc1_badge: "Engine Mappe 4D", sc1_title: "Visualizzazione 3D della Città", sc1_desc: "Mappa urbana 3D/4D in tempo reale con layer di dati live, controllo temporale e overlay digital twin.",
+    sc2_badge: "Dashboard Analytics", sc2_title: "Dashboard Operative", sc2_desc: "Dashboard KPI drag-and-drop con widget dati in tempo reale, grafici e pannelli di alert configurabili.",
+    sc3_badge: "Osservazione della Terra", sc3_title: "Layer Immagini Satellitari", sc3_desc: "Immagini SAR e ottiche Copernicus Sentinel integrate come layer cartografici live con navigazione temporale.",
+    sc4_badge: "Monitoraggio IoT", sc4_title: "Rete Sensori Intelligente", sc4_desc: "Mappa sensori IoT live con telemetria in tempo reale, soglie di alert e analisi tendenze storiche per dispositivo.",
+    sc5_badge: "Simulazione Rischi", sc5_title: "Simulazione Alluvioni e Clima", sc5_desc: "Modellazione rischio alluvione, analisi isole di calore e simulazione scenari di disastro con motore digital twin AI.",
+    sc6_badge: "Gemello Infrastrutturale", sc6_title: "Digital Twin delle Infrastrutture", sc6_desc: "Modello 3D della città integrato con BIM, monitoraggio strutturale, tracciamento del ciclo di vita e scoring manutenzione predittiva.",
+    sc7_badge: "Traffico & Mobilità", sc7_title: "Simulazione Flussi di Traffico", sc7_desc: "Monitoraggio traffico in tempo reale, previsione congestione e simulazione mobilità sulla rete stradale urbana.",
+    sc8_badge: "Workflow GeoAI", sc8_title: "AI Workflow Builder", sc8_desc: "Pipeline builder visuale drag-and-drop per elaborazione geospaziale AI, concatenazione modelli e analisi on-demand.",
+    sc9_badge: "Gestione Emergenze", sc9_title: "Centro Operativo di Crisi", sc9_desc: "Dashboard di gestione emergenze integrata con coordinamento multi-agenzia, alert in tempo reale e tracciamento incidenti.",
+    sc10_badge: "Panoramica Città", sc10_title: "Urban Situation Awareness", sc10_desc: "Vista operativa unificata a scala urbana che aggrega tutti i data stream, alert e KPI in un'unica control room in tempo reale.",
+    price_tag: "Prezzi", price_title: "Piani per ogni città",
+    price_desc: "Da progetti pilota a deployment metropolitani completi. Prezzi flessibili e trasparenti che scalano con le esigenze della tua città.",
+    plan1_name: "Starter", per_month: "/mese",
+    plan0_name: "Gratuito", plan0_desc: "Esplora URBOS senza impegno. Perfetto per sviluppatori, ricercatori e team che valutano la piattaforma.",
+    pf0_1: "1 integrazione sorgente dati", pf0_2: "Visualizzatore mappa 2D (sola lettura)", pf0_3: "Dataset città campione incluso",
+    pf0_4: "Dashboard base (3 widget)", pf0_5: "Supporto community", pf0_6: "2 utenti",
+    pf0_7: "Stream dati in tempo reale", pf0_8: "AI/ML e simulazioni",
+    btn_free: "Inizia gratis",
+    plan1_desc: "Ideale per programmi pilota e piccoli comuni. Inizia con le funzionalità base di monitoraggio e visualizzazione.",
+    pf1_1: "Fino a 3 integrazioni sorgenti dati", pf1_2: "Visualizzatore mappa 2D/3D (sola lettura)", pf1_3: "Dashboard operativa preconfigurata",
+    pf1_4: "Sistema di alerting base", pf1_5: "Connessione servizi OGC", pf1_6: "5 utenti",
+    pf1_7: "Analytics AI/ML", pf1_8: "Simulazioni personalizzate",
+    plan2_badge: "Più Scelto", plan2_name: "Professional",
+    plan2_desc: "Per città medie e operatori infrastrutturali che richiedono analytics real-time completo e capacità AI avanzate.",
+    pf2_1: "Integrazioni sorgenti illimitate", pf2_2: "Map builder 4D interattivo", pf2_3: "Dashboard & widget builder personalizzati",
+    pf2_4: "GeoAI workflow builder", pf2_5: "Analytics predittiva & rilevamento anomalie", pf2_6: "Modelli di simulazione urbana",
+    pf2_7: "Alerting & notifiche avanzate", pf2_8: "25 utenti + accesso API",
+    plan3_name: "Enterprise", plan3_price: "Su misura",
+    plan3_desc: "Per aree metropolitane, enti nazionali e deployment multi-città che richiedono full SaaS, integrazioni custom e supporto dedicato.",
+    pf3_1: "Tutte le funzionalità Professional", pf3_2: "Deployment multi-città / multi-tenant", pf3_3: "Infrastruttura cloud dedicata",
+    pf3_4: "Sviluppo modelli AI personalizzati", pf3_5: "Opzione on-premise o cloud privato", pf3_6: "SLA e team di supporto dedicato",
+    pf3_7: "Utenti e chiamate API illimitati", pf3_8: "Formazione e onboarding inclusi",
+    btn_start: "Inizia ora", btn_contact: "Contatta le vendite",
+    cta_tag: "Inizia oggi", cta_title: "Costruisci la città di domani",
+    cta_desc: "Unisciti a comuni, utilities e operatori infrastrutturali in tutta Europa che già utilizzano URBOS.",
+    cta_btn1: "Richiedi una Demo", cta_btn2: "Vedi i Prezzi",
+    footer_desc: "Il Sistema Operativo Urbano. Una piattaforma SaaS per il monitoraggio urbano in tempo reale, simulazione, analytics e supporto decisionale.",
+    footer_col1: "Piattaforma", footer_col2: "Soluzioni", footer_col3: "Azienda",
+    fp_maps: "Mappe 4D", fp_dash: "Dashboard", fp_geoai: "Workflow GeoAI", fp_alerts: "Alert", fp_api: "Riferimento API",
+    fs_muni: "Comuni", fs_util: "Utilities", fs_trans: "Trasporti", fs_env: "Ambiente", fs_emerg: "Emergenze",
+    fc_about: "Chi siamo", fc_blog: "Blog", fc_careers: "Carriere", fc_contact: "Contatti", fc_docs: "Documentazione",
+    fl_privacy: "Privacy Policy", fl_terms: "Termini di Servizio", fl_cookies: "Cookie Policy"
+  }
+};
+
+let currentLang = 'en';
+let currentTheme = 'dark';
+
+function applyTranslations(lang) {
+  const t = translations[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key]) el.textContent = t[key];
+  });
+  // HTML translations (hero title)
+  const heroTitle = document.querySelector('h1.hero-title');
+  if (heroTitle && t['hero_title_html']) heroTitle.innerHTML = t['hero_title_html'];
+  document.documentElement.lang = lang;
+}
+
+function toggleLang() {
+  currentLang = currentLang === 'en' ? 'it' : 'en';
+  document.getElementById('langBtn').textContent = currentLang === 'en' ? 'IT' : 'EN';
+  applyTranslations(currentLang);
+}
+
+function toggleTheme() {
+  currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  document.getElementById('themeBtn').textContent = currentTheme === 'dark' ? '☀' : '☾';
+}
+
+// ── Scroll Reveal ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ── Carousel ──
+(function() {
+  const track = document.getElementById('carouselTrack');
+  const prevBtn = document.getElementById('carouselPrev');
+  const nextBtn = document.getElementById('carouselNext');
+  const currentEl = document.getElementById('carouselCurrent');
+  const dotsContainer = document.getElementById('carouselDots');
+  if (!track) return;
+
+  const slides = track.querySelectorAll('.carousel-slide');
+  const total = slides.length;
+  let current = 0;
+  let autoTimer = null;
+
+  // Build dots
+  slides.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', 'Slide ' + (i+1));
+    dot.addEventListener('click', () => goTo(i));
+    dotsContainer.appendChild(dot);
+  });
+
+  function updateDots() {
+    dotsContainer.querySelectorAll('.carousel-dot').forEach((d, i) => {
+      d.classList.toggle('active', i === current);
+    });
+  }
+
+  function goTo(idx) {
+    slides[current].classList.remove('active');
+    current = (idx + total) % total;
+    slides[current].classList.add('active');
+    track.style.transform = `translateX(-${current * 100}%)`;
+    currentEl.textContent = current + 1;
+    updateDots();
+    resetAuto();
+  }
+
+  function resetAuto() {
+    clearInterval(autoTimer);
+    autoTimer = setInterval(() => goTo(current + 1), 5000);
+  }
+
+  prevBtn.addEventListener('click', () => goTo(current - 1));
+  nextBtn.addEventListener('click', () => goTo(current + 1));
+
+  // Touch/swipe support
+  let touchStartX = 0;
+  track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, {passive:true});
+  track.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 40) goTo(dx < 0 ? current + 1 : current - 1);
+  }, {passive:true});
+
+  // Init
+  slides[0].classList.add('active');
+  resetAuto();
+})();
+
+// ── Nav scroll effect ──
+window.addEventListener('scroll', () => {
+  const nav = document.querySelector('nav');
+  nav.style.borderBottomColor = window.scrollY > 20 ? 'var(--border-bright)' : 'var(--border)';
+});
+</script>
+</body>
+</html>
